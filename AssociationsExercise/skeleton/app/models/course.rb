@@ -8,12 +8,12 @@ class Course < ActiveRecord::Base
   has_many(
     :enrolled_students,
     through: :enrollments,
-    source: :student
+    source:  :student
     )
   belongs_to(
     :instructor,
     class_name: "User",
     foreign_key: :instructor_id,
-    primary_key: :id    
+    primary_key: :id
   )
 end

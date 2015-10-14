@@ -20,6 +20,7 @@ class Interface
       get_user_object
 
       until @choice == "1" || @choice == "2" || @choice == "3"
+        # begin
         get_input
       end
 
@@ -27,15 +28,20 @@ class Interface
 
       if @choice == "1"
         get_long_url_input
-        create_short_url
+        unless @url_object.nil? || @url_object.id
+          puts @url_object.errors[:base]
+          sleep(2)
+          @choice = nil
+          @short_url = nil
+        else
+          create_short_url
+        end
       else
         get_short_url_input
         find_url_object_by_short_url
         visit_url
         record_visit
       end
-
-      @choice = nil
     end
 
     nil
@@ -63,7 +69,7 @@ class Interface
   end
 
   def create_short_url
-    @url_object = ShortenedUrl.create_for_user_and_long_url!(@user, @long_url)
+    @url_object =  ShortenedUrl.create_for_user_and_long_url(@user, @long_url)
     @short_url = @url_object.short_url
     nil
   end

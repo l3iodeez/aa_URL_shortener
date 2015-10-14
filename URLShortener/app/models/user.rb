@@ -13,5 +13,11 @@ class User < ActiveRecord::Base
     through: :visits,
     source: :shortened_url
   )
+  has_many(
+    :submissions,
+    class_name: 'ShortenedUrl',
+    foreign_key: :submitter_id,
+    primary_key: :id
+  )
 
 end

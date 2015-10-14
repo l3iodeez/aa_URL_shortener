@@ -1,0 +1,104 @@
+#require_relative '../config/application.rb'
+require 'launchy'
+
+
+class Interface
+
+  def initialize
+    run
+  end
+
+  def run
+    until false
+      system('clear')
+      puts "Your short URL for #{@long_url} is #{@short_url}" if @short_url
+      puts
+      while @email.nil? || @email.empty?
+        get_email
+      end
+
+      get_user_object
+
+      until @choice == "1" || @choice == "2" || @choice == "3"
+        get_input
+      end
+
+      break if @choice == "3"
+
+      if @choice == "1"
+        get_long_url_input
+        create_short_url
+      else
+        get_short_url_input
+        find_url_object_by_short_url
+        visit_url
+        record_visit
+      end
+
+      @choice = nil
+    end
+
+    nil
+  end
+
+  def get_input
+    puts "What do you want to do?"
+    puts "1. Create shortened URL"
+    puts "2. Visit shortened URL"
+    puts "3. Quit URL shortener"
+    @choice = gets.chomp
+    nil
+  end
+
+  def get_email
+    puts "Enter your email:"
+    @email = gets.chomp
+    nil
+  end
+
+  def get_user_object
+    @user = User.where('email = ?', @email).first ||
+            User.create!(email: @email)  # Ask about this, is there a better way using .find ?
+    # User.find_by_email('?', @email)
+  end
+
+  def create_short_url
+    @url_object = ShortenedUrl.create_for_user_and_long_url!(@user, @long_url)
+    @short_url = @url_object.short_url
+    nil
+  end
+
+  def get_long_url_input
+    puts "Type your long URL:"
+    @long_url = gets.chomp
+    nil
+  end
+
+  def get_short_url_input
+    puts "Type your short URL:"
+    @short_url = gets.chomp
+    nil
+  end
+
+  def find_url_object_by_short_url
+    raise "Invalid short url" if @short_url.nil? || @short_url.empty?
+    @url_object = ShortenedUrl.where('short_url = ?', @short_url).first
+    @long_url = @url_object.long_url
+    nil
+  end
+
+  def visit_url
+    Launchy.open(@long_url)
+  end
+
+  def record_visit
+    raise 'Record Visit Error' if @user.nil? || @url_object.nil?
+    Visit.record_visit!(@user, @url_object)
+    nil
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+
+  Interface.new
+end

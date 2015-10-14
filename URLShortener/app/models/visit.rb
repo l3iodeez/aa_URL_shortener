@@ -3,7 +3,7 @@ class Visit < ActiveRecord::Base
   validates :shortened_url_id, :presence => true
 
   belongs_to(
-    :user,
+    :visitor,
     class_name: "User",
     foreign_key: :user_id,
     primary_key: :id

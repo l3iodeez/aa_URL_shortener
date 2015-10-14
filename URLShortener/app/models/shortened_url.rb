@@ -12,8 +12,9 @@ class ShortenedUrl < ActiveRecord::Base
 
   has_many(
     :visitors,
+    Proc.new { distinct },
     through: :visits,
-    source: :user
+    source: :visitor
   )
 
   def self.random_code
@@ -34,7 +35,8 @@ class ShortenedUrl < ActiveRecord::Base
   end
 
   def num_uniques
-    visits.select(:user_id).distinct.count
+    visitors.count
+    # visits.select(:user_id).distinct.count
   end
 
   def num_clicks

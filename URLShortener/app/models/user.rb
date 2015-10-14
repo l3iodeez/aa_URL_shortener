@@ -7,5 +7,11 @@ class User < ActiveRecord::Base
     foreign_key: :user_id,
     primary_key: :id
   )
+  has_many(
+    :visited_urls,
+    Proc.new { distinct },
+    through: :visits,
+    source: :shortened_url
+  )
 
 end
